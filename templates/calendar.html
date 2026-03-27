@@ -193,12 +193,141 @@
       .btn-print:hover {
         background-color: #2e59d9;
       }
+
+      /* ================= A4 PERFECT PRINT ================= */
+      @media print {
+        /* A4 page setup */
+        @page {
+          size: A4;
+          margin: 20mm;
+        }
+
+        /* Hide UI */
+        .d-flex.justify-content-between.align-items-center.mb-4,
+        .rosca-title,
+        .btn-print {
+          display: none !important;
+        }
+
+        /* Show all months */
+        .collapse-months {
+          display: block !important;
+        }
+
+        /* Page base */
+        body {
+          background: #ffffff !important;
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+
+        .container {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding: 0 !important;
+        }
+
+        /* Center EACH month vertically + horizontally */
+        .calendar-card {
+          page-break-after: always;
+
+          /* CENTERING MAGIC */
+          display: flex;
+          flex-direction: column;
+          justify-content: center; /* vertical center */
+          align-items: center; /* horizontal center */
+
+          min-height: 90vh; /* balance top/bottom on page */
+
+          width: 100%;
+          margin: 0 auto;
+
+          background: #ffffff !important;
+          border-radius: 14px;
+          padding: 20px;
+
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05) !important;
+          border: 1px solid #e3e6f0;
+        }
+
+        .calendar-card:last-child {
+          page-break-after: auto;
+        }
+
+        /* Username */
+        h3.print-username {
+          display: block !important;
+          font-size: 26px;
+          text-align: center;
+          margin-bottom: 20px;
+          font-weight: 700;
+          color: #2e2e2e;
+        }
+
+        /* Month title */
+        .month-title {
+          font-size: 24px;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 18px;
+          color: #333;
+        }
+
+        /* Table wrapper to control width */
+        .calendar-table {
+          width: 95%;
+          border-collapse: separate !important;
+          border-spacing: 6px !important;
+        }
+
+        /* Header */
+        .calendar-table th {
+          background: #4e73df !important;
+          color: #fff !important;
+          font-size: 15px;
+          padding: 10px;
+          border-radius: 8px;
+          border: none !important;
+        }
+
+        /* Cells */
+        .calendar-table td {
+          height: 105px;
+          background: #f8f9fc !important;
+          border-radius: 10px;
+          border: 1px solid #e3e6f0 !important;
+          position: relative;
+          font-size: 15px;
+        }
+
+        /* Paid */
+        .paid-day {
+          background: linear-gradient(135deg, #1cc88a, #17a673) !important;
+          color: #ffffff !important;
+          border: none !important;
+        }
+
+        /* Day number */
+        .day-number {
+          font-size: 18px !important;
+          font-weight: 700;
+          top: 8px;
+          right: 10px;
+        }
+
+        /* Contribution */
+        .contribution {
+          font-size: 13px !important;
+          bottom: 8px;
+          left: 8px;
+        }
+      }
     </style>
   </head>
   <body>
     <div class="container mt-5">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="fw-bold">{{ user.username }} Calendars</h3>
+        <h3 class="print-username">{{ user.username }} Calendars</h3>
         <div>
           <a href="/admin" class="btn btn-secondary me-2">Back</a>
           <a href="/logout" class="btn btn-danger">Logout</a>
