@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ user.username }} Calendars</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(to right, #eef2f7, #f8f9fc);
+        font-family: "Segoe UI", sans-serif;
+        padding-top: 80px; /* ✅ space for fixed top bar */
+        padding-bottom: 50px;
+      }
+
+      /* ================= FIXED TOP BAR ================= */
+      .d-flex.justify-content-between.align-items-center.mb-4 {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1030;
+        background-color: #f0f2f5;
+        padding: 1rem 0;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .d-flex.justify-content-between.align-items-center.mb-4 > * {
+        max-width: 1140px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      /* Buttons wrap + spacing */
+      .d-flex.justify-content-between.align-items-center.mb-4 > div {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .d-flex.justify-content-between.align-items-center.mb-4 a,
+      .d-flex.justify-content-between.align-items-center.mb-4 button {
+        white-space: nowrap;
+      }
+
+      /* MOBILE FIX */
+      @media (max-width: 768px) {
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+          flex-direction: column;
+          align-items: stretch;
+          margin-bottom: 5px;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-4 > div {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .d-flex.justify-content-between.align-items-center.mb-4 a,
+        .d-flex.justify-content-between.align-items-center.mb-4 button {
+          flex: 1;
+          text-align: center;
+        }
+      }
+
+      /* ================= ROSCA TITLES ================= */
+      .rosca-title {
+        display: block;
+        width: 100%;
+        padding: 18px 20px;
+        border-radius: 14px;
+        margin: 20px 0 10px 0;
+        cursor: pointer;
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        transition: all 0.25s ease;
+      }
+
+      .rosca-title:nth-of-type(2) {
+        background: linear-gradient(135deg, #1cc88a, #17a673);
+      }
+
+      .rosca-title:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      }
+
+      .rosca-title:active {
+        transform: scale(0.98);
+      }
+
+      .collapse-months {
+        display: none;
+      }
+
+      /* ================= CALENDAR CARD ================= */
+      .calendar-card {
+        border-radius: 12px;
+        margin-bottom: 25px;
+        padding: 15px;
+        background: linear-gradient(145deg, #fff, #f7f9fc);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: 0.2s;
+      }
+
+      .calendar-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      }
+
+      .month-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2e2e2e;
+      }
+
+      .calendar-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .calendar-table th {
+        background-color: #e9ecef;
+        color: #495057;
+        font-weight: 600;
+        text-align: center;
+        padding: 8px;
+      }
+
+      .calendar-table td {
+        height: 60px;
+        width: 60px;
+        vertical-align: top;
+        padding: 5px;
+        position: relative;
+        cursor: pointer;
+        transition: 0.2s;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+      }
+
+      .calendar-table td:hover {
+        background-color: #f1f3f5;
+      }
+
+      .paid-day {
+        background-color: #1cc88a !important;
+        color: white;
+        border-radius: 6px;
+        font-weight: bold;
+      }
+
+      .day-number {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        font-size: 14px;
+      }
+
+      .contribution {
+        position: absolute;
+        bottom: 4px;
+        left: 4px;
+        font-size: 12px;
+        color: #333;
+      }
+
+      /* ================= PRINT BUTTON ================= */
+      .btn-print {
+        background-color: #4e73df;
+        color: white;
+        border: none;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 5px 12px;
+        transition: 0.2s;
+      }
+
+      .btn-print:hover {
+        background-color: #2e59d9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">{{ user.username }} Calendars</h3>
+        <div>
+          <a href="/admin" class="btn btn-secondary me-2">Back</a>
+          <a href="/logout" class="btn btn-danger">Logout</a>
+          <button class="btn-print" onclick="window.print()">Print Year</button>
+        </div>
+      </div>
+
+      {% for rosca_num, months_by_year, payments in [(1, months_by_year1,
+      payments_rosca1), (2, months_by_year2, payments_rosca2)] %} {% if
+      months_by_year %}
+      <div class="rosca-title" onclick="toggleRosca({{ rosca_num }})">
+        Rosca {{ rosca_num }}
+      </div>
+
+      <div id="rosca-months-{{ rosca_num }}" class="collapse-months">
+        {% for year, months in months_by_year.items() %} {% for month in months
+        %} {% set cal = calendar.monthcalendar(year, month) %}
+        <div
+          class="calendar-card"
+          id="calendar-{{ rosca_num }}-{{ year }}-{{ month }}"
+        >
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="month-title">
+              {{ calendar.month_name[month] }} {{ year }}
+            </div>
+            <button
+              class="btn-print"
+              onclick="printMonth('{{ rosca_num }}','{{ year }}','{{ month }}')"
+            >
+              Print Month
+            </button>
+          </div>
+
+          <table class="calendar-table text-center">
+            <thead>
+              <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for week in cal %}
+              <tr>
+                {% for day in week %} {% if day != 0 %} {% set date_str =
+                '{}-{:02d}-{:02d}'.format(year, month, day) %} {% set
+                day_payment =
+                payments|selectattr('date','equalto',date_str)|list|first %}
+                <td
+                  class="{% if day_payment and day_payment.paid %}paid-day{% endif %}"
+                  data-user-id="{{ user.id }}"
+                  data-date="{{ date_str }}"
+                  data-rosca="{{ rosca_num }}"
+                  data-paid="{% if day_payment and day_payment.paid %}1{% else %}0{% endif %}"
+                >
+                  <div class="day-number">{{ day }}</div>
+                  {% if calendar.weekday(year, month, day) == 5 %}
+                  <div class="contribution">
+                    {% if rosca_num == 1 %} ${{ '%.2f' %
+                    user.contribution_amount_rosca1 }} {% else %} ${{ '%.2f' %
+                    user.contribution_amount_rosca2 }} {% endif %}
+                  </div>
+                  {% endif %}
+                </td>
+                {% else %}
+                <td></td>
+                {% endif %} {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endfor %} {% endfor %}
+      </div>
+      {% endif %} {% endfor %}
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Attach markPaid to every day cell
+        document.querySelectorAll("td[data-user-id]").forEach((td) => {
+          td.addEventListener("click", () => {
+            const userId = td.dataset.userId;
+            const dateStr = td.dataset.date;
+            const roscaNum = td.dataset.rosca;
+
+            fetch("/admin/mark_paid", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                user_id: userId,
+                date: dateStr,
+                rosca: roscaNum,
+              }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                console.log("✅ Response:", data);
+                if (data.success) {
+                  if (data.paid) td.classList.add("paid-day");
+                  else td.classList.remove("paid-day");
+                } else {
+                  alert("❌ Payment not found or error");
+                }
+              })
+              .catch((err) => {
+                console.error("❌ Fetch error:", err);
+                alert("⚠️ Network/server error");
+              });
+          });
+        });
+      });
+
+      function toggleRosca(roscaNum) {
+        const el = document.getElementById(`rosca-months-${roscaNum}`);
+        el.style.display = el.style.display === "block" ? "none" : "block";
+      }
+
+      function printMonth(roscaNum, year, month) {
+        const cardId = `calendar-${roscaNum}-${year}-${month}`;
+        const printContent = document.getElementById(cardId)?.outerHTML;
+        if (!printContent) return;
+
+        const originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContent;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+      }
+    </script>
+  </body>
+</html>

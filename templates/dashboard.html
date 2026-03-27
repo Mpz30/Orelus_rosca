@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | {{username}}</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(to right, #eef2f7, #f8f9fc);
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .header {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+      }
+
+      /* ✅ HEADER BUTTON FIX (desktop + mobile) */
+      .header {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .header > div {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .header a {
+        white-space: nowrap;
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .header > div {
+          width: 100%;
+          justify-content: space-between;
+        }
+
+        .header a {
+          flex: 1;
+          text-align: center;
+        }
+      }
+
+      .main-btn {
+        border-radius: 12px;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      /* 👇 ADMIN SUMMARY CARDS (GRADIENTS) */
+      .admin-summary {
+        margin-top: 20px;
+      }
+
+      .admin-card {
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        color: white;
+        font-weight: 700;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .admin-card h5 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #fff;
+      }
+
+      .admin-card p {
+        font-size: 1.5rem;
+        margin: 0;
+      }
+
+      .admin-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      /* Specific colors for each card */
+      .admin-card.rosca1 {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+      }
+      .admin-card.rosca2 {
+        background: linear-gradient(135deg, #ff7e5f, #feb47b);
+      }
+      .admin-card.next-payday {
+        background: linear-gradient(135deg, #36d1dc, #5b86e5);
+      }
+
+      /* ADMIN MONTH CARDS */
+      .month-card {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+      }
+
+      .month-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+      }
+
+      .month-title {
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+
+      .payday-list {
+        display: none;
+        background: rgba(255, 255, 255, 0.95);
+        color: black;
+        border-radius: 12px;
+        padding: 10px;
+        margin-top: 10px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      /* Calendar */
+      table.calendar {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table.calendar th,
+      table.calendar td {
+        width: 14.28%;
+        height: 80px;
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      table.calendar td {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+      }
+
+      .paid-day {
+        background-color: #a0e7a0;
+        position: relative;
+      }
+
+      .paid-day::after {
+        content: "💰";
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        font-size: 14px;
+      }
+
+      /* Add soft card feel to calendar (no color change) */
+      table.calendar {
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      table.calendar td {
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+
+      table.calendar td:hover {
+        transform: scale(1.02);
+      }
+
+      table.calendar th {
+        background-color: #c6dff8;
+        font-weight: 600;
+      }
+
+      .paid-day {
+        background-color: #a0e7a0;
+        box-shadow:
+          inset 0 0 5px rgba(0, 0, 0, 0.1),
+          0 2px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <div class="header d-flex justify-content-between align-items-center">
+        <h4>Welcome, {{username}}</h4>
+
+        <div>
+          <a href="/payday" class="btn btn-info me-2">Payday</a>
+
+          {% if session.is_admin %}
+          <a href="/admin" class="btn btn-secondary me-2">Admin</a>
+          {% endif %}
+
+          <a href="/logout" class="btn btn-danger">Logout</a>
+        </div>
+      </div>
+
+      <!-- Main Button -->
+      <div class="text-center mt-4">
+        <button
+          class="btn btn-primary main-btn"
+          onclick="window.location.href='{{ url_for('user_calendar') }}'"
+        >
+          📅 View Full Calendar
+        </button>
+      </div>
+
+      <!-- 👇 ADMIN SUMMARY CARDS -->
+      {% if session.is_admin %}
+      <div class="row row-cols-1 row-cols-md-3 g-4 admin-summary mt-4">
+        <div class="col">
+          <div class="admin-card rosca1">
+            <h5>Rosca 1 Users</h5>
+            <p>{{ rosca1_count }}</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="admin-card rosca2">
+            <h5>Rosca 2 Users</h5>
+            <p>{{ rosca2_count }}</p>
+          </div>
+        </div>
+        <div class="col">
+          <div class="admin-card next-payday">
+            <h5>Next Payday</h5>
+            <p>{{ next_payday if next_payday else "N/A" }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- 👇 ADMIN MONTH CARDS -->
+      {% if session.is_admin %}
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 mt-4">
+        {% for month in range(1,13) %}
+        <div class="col">
+          <div class="month-card" onclick="togglePaydays({{month}})">
+            <div class="month-title">
+              {{ calendar.month_name[month] }} {{ now.year }}
+            </div>
+
+            <div id="paydays-{{month}}" class="payday-list">
+              {% if paydays_by_month[month] %} {% for p in
+              paydays_by_month[month] %}
+              <div>👤 {{p.username}} — {{p.date}} — ${{p.amount}}</div>
+              {% endfor %} {% else %}
+              <div>No paydays</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- 👇 USER CURRENT MONTH CALENDAR -->
+      {% if not session.is_admin and cal %}
+      <h5 class="mt-5 text-center">
+        {{ calendar.month_name[current_month] }} {{ current_year }}
+      </h5>
+      <table class="calendar">
+        <thead>
+          <tr>
+            {% for day in ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"] %}
+            <th>{{day}}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for week in cal %}
+          <tr>
+            {% for day in week %} {% if day == 0 %}
+            <td></td>
+            {% else %}
+            <td class="{% if day in paid_days %}paid-day{% endif %}">
+              {{day}} {% if day in contribution_days %}
+              <br /><small>${{ contribution_days[day] }}</small>
+              {% endif %}
+            </td>
+            {% endif %} {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+
+    <script>
+      function togglePaydays(month) {
+        const el = document.getElementById("paydays-" + month);
+        if (el.style.display === "block") {
+          el.style.display = "none";
+        } else {
+          el.style.display = "block";
+        }
+      }
+    </script>
+  </body>
+</html>

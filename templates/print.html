@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Print Calendar | {{user.username}}</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        padding: 20px;
+        background-color: #f5f6fa;
+        color: #333;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+
+      .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .print-header h3 {
+        margin: 0;
+        font-weight: 700;
+        color: #4e73df;
+      }
+
+      .calendar-card {
+        background: #f9fafc;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        page-break-inside: avoid;
+      }
+
+      .calendar-card h5 {
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #1f2937;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 5px;
+      }
+
+      .calendar-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .calendar-table th,
+      .calendar-table td {
+        width: 70px;
+        height: 70px;
+        text-align: center;
+        vertical-align: top;
+        padding: 5px;
+        border: 1px solid #dee2e6;
+        position: relative;
+        background-color: #ffffff;
+        border-radius: 6px;
+      }
+
+      .calendar-table th {
+        background-color: #e2e8f0;
+        font-weight: 600;
+      }
+
+      .day-number {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .paid-day {
+        background: linear-gradient(135deg, #34d399, #10b981);
+        color: white;
+        font-weight: 600;
+      }
+
+      .contribution {
+        font-size: 11px;
+        margin-top: 18px;
+        display: block;
+        font-weight: 500;
+      }
+
+      @media print {
+        .no-print {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="print-header no-print">
+      <h3>Printable Calendar: {{user.username}}</h3>
+      <button onclick="window.print()" class="btn btn-primary">Print</button>
+    </div>
+
+    {% for month, payments in month_payments.items() %}
+    <div class="calendar-card">
+      <h5>{{calendar.month_name[month]}} {{year}}</h5>
+
+      <table class="table calendar-table text-center">
+        <thead>
+          <tr>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+            <th>Sun</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set cal = calendar.monthcalendar(year, month) %} {% for week in cal
+          %}
+          <tr>
+            {% for day in week %} {% if day != 0 %} {% set date = year|string +
+            '-' + '%02d' % month + '-' + '%02d' % day %} {% set payment =
+            payments | selectattr('date', 'equalto', date) | list | first %}
+
+            <td class="{% if payment and payment.paid %}paid-day{% endif %}">
+              <div class="day-number">{{day}}</div>
+
+              {% if payment and loop.index0 == 5 %} {% if rosca == 1 %}
+              <span class="contribution">
+                ${{'%.2f' % user.contribution_amount_rosca1}}
+              </span>
+              {% elif rosca == 2 %}
+              <span class="contribution">
+                ${{'%.2f' % user.contribution_amount_rosca2}}
+              </span>
+              {% endif %} {% endif %}
+            </td>
+
+            {% else %}
+            <td></td>
+            {% endif %} {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endfor %}
+  </body>
+</html>
