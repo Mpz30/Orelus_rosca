@@ -194,6 +194,17 @@
         background-color: #2e59d9;
       }
 
+      @media (max-width: 768px) {
+        .contribution {
+          font-size: 0; /* hide original text */
+        }
+
+        .contribution::after {
+          content: attr(data-amount);
+          font-size: 12px;
+        }
+      }
+
       /* ================= A4 PERFECT PRINT ================= */
       @media print {
         /* A4 page setup */
@@ -389,7 +400,10 @@
                 >
                   <div class="day-number">{{ day }}</div>
                   {% if calendar.weekday(year, month, day) == 5 %}
-                  <div class="contribution">
+                  <div
+                    class="contribution"
+                    data-amount="{% if rosca_num == 1 %}${{ user.contribution_amount_rosca1|int }}{% else %}${{ user.contribution_amount_rosca2|int }}{% endif %}"
+                  >
                     {% if rosca_num == 1 %} ${{ '%.2f' %
                     user.contribution_amount_rosca1 }} {% else %} ${{ '%.2f' %
                     user.contribution_amount_rosca2 }} {% endif %}
