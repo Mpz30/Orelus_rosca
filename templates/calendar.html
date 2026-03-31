@@ -203,6 +203,10 @@
           content: attr(data-amount);
           font-size: 12px;
         }
+
+        .rosca-title {
+          margin-top: 80px;
+        }
       }
 
       /* ================= A4 PERFECT PRINT ================= */
@@ -332,6 +336,10 @@
           bottom: 8px;
           left: 8px;
         }
+
+        .contribution::after {
+          content: "" !important;
+        }
       }
     </style>
   </head>
@@ -340,6 +348,9 @@
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h3 class="print-username">{{ user.username }} Calendars</h3>
         <div>
+          <button onclick="toggleLanguage()" class="btn btn-warning">
+            🌐 FR / EN
+          </button>
           <a href="/admin" class="btn btn-secondary me-2">Back</a>
           <a href="/logout" class="btn btn-danger">Logout</a>
           <button class="btn-print" onclick="window.print()">Print Year</button>
@@ -402,10 +413,10 @@
                   {% if calendar.weekday(year, month, day) == 5 %}
                   <div
                     class="contribution"
-                    data-amount="{% if rosca_num == 1 %}${{ user.contribution_amount_rosca1|int }}{% else %}${{ user.contribution_amount_rosca2|int }}{% endif %}"
+                    data-amount="{% if rosca_num == 1 %}HTG {{ user.contribution_amount_rosca1|int }}{% else %}HTG{{ user.contribution_amount_rosca2|int }}{% endif %}"
                   >
-                    {% if rosca_num == 1 %} ${{ '%.2f' %
-                    user.contribution_amount_rosca1 }} {% else %} ${{ '%.2f' %
+                    {% if rosca_num == 1 %} HTG {{ '%.2f' %
+                    user.contribution_amount_rosca1 }} {% else %} HTG{{ '%.2f' %
                     user.contribution_amount_rosca2 }} {% endif %}
                   </div>
                   {% endif %}
@@ -475,6 +486,148 @@
         document.body.innerHTML = originalContents;
         location.reload();
       }
+
+      // ================= TRANSLATION SYSTEM =================
+      let currentLang = "fr";
+
+      const months = {
+        en: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ],
+        fr: [
+          "Janvier",
+          "Février",
+          "Mars",
+          "Avril",
+          "Mai",
+          "Juin",
+          "Juillet",
+          "Août",
+          "Septembre",
+          "Octobre",
+          "Novembre",
+          "Décembre",
+        ],
+      };
+
+      const days = {
+        en: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        fr: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+      };
+
+      const translations = {
+        en: {
+          calendars: "Calendars",
+          back: "Back",
+          logout: "Logout",
+          printYear: "Print Year",
+          printMonth: "Print Month",
+        },
+        fr: {
+          calendars: "Calendriers",
+          back: "Retour",
+          logout: "Déconnexion",
+          printYear: "Imprimer l'année",
+          printMonth: "Imprimer le mois",
+        },
+      };
+
+      function applyTranslations(lang) {
+        const t = translations[lang];
+
+        // ✅ Title (username Calendars)
+        const title = document.querySelector(".print-username");
+        if (title) {
+          const username = title.innerText.split(" ")[0];
+          title.innerText = username + " " + t.calendars;
+        }
+
+        // ✅ Top buttons
+        const backBtn = document.querySelector('a[href="/admin"]');
+        if (backBtn) backBtn.innerText = t.back;
+
+        const logoutBtn = document.querySelector('a[href="/logout"]');
+        if (logoutBtn) logoutBtn.innerText = t.logout;
+
+        // Print Year (ONLY first one)
+        const printYearBtn = document.querySelector(".btn-print");
+        if (
+          printYearBtn &&
+          printYearBtn.innerText.toLowerCase().includes("print")
+        ) {
+          printYearBtn.innerText = t.printYear;
+        }
+
+        // Print Month buttons
+        document.querySelectorAll(".btn-print").forEach((btn) => {
+          if (
+            btn.innerText.toLowerCase().includes("month") ||
+            btn.innerText.toLowerCase().includes("mois")
+          ) {
+            btn.innerText = t.printMonth;
+          }
+        });
+
+        // ✅ FIXED Month titles (robust detection)
+        document.querySelectorAll(".month-title").forEach((el) => {
+          const text = el.innerText.trim();
+
+          const yearMatch = text.match(/\d{4}/);
+          if (!yearMatch) return;
+
+          const year = yearMatch[0];
+
+          let index = -1;
+
+          months.en.forEach((m, i) => {
+            if (text.toLowerCase().includes(m.toLowerCase())) {
+              index = i;
+            }
+          });
+
+          months.fr.forEach((m, i) => {
+            if (text.toLowerCase().includes(m.toLowerCase())) {
+              index = i;
+            }
+          });
+
+          if (index !== -1) {
+            el.innerText = months[lang][index] + " " + year;
+          }
+        });
+
+        // ✅ FIXED Weekday headers (no undefined)
+        document.querySelectorAll(".calendar-table thead tr").forEach((row) => {
+          const ths = row.querySelectorAll("th");
+
+          if (ths.length === 7) {
+            ths.forEach((th, i) => {
+              th.innerText = days[lang][i];
+            });
+          }
+        });
+      }
+
+      function toggleLanguage() {
+        currentLang = currentLang === "en" ? "fr" : "en";
+        applyTranslations(currentLang);
+      }
+
+      // ✅ Load French by default
+      window.addEventListener("load", () => {
+        applyTranslations("fr");
+      });
     </script>
   </body>
 </html>

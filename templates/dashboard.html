@@ -211,6 +211,9 @@
         <h4>Welcome, {{username}}</h4>
 
         <div>
+          <button onclick="toggleLanguage()" class="btn btn-warning">
+            🌐 FR / EN
+          </button>
           <a href="/payday" class="btn btn-info me-2">Payday</a>
 
           {% if session.is_admin %}
@@ -236,13 +239,13 @@
       <div class="row row-cols-1 row-cols-md-3 g-4 admin-summary mt-4">
         <div class="col">
           <div class="admin-card rosca1">
-            <h5>Rosca 1 Users</h5>
+            <h5>Rosca 1 (HTG 10.000.00) Users</h5>
             <p>{{ rosca1_count }}</p>
           </div>
         </div>
         <div class="col">
           <div class="admin-card rosca2">
-            <h5>Rosca 2 Users</h5>
+            <h5>Rosca 2 (HTG 3.000.00) Users</h5>
             <p>{{ rosca2_count }}</p>
           </div>
         </div>
@@ -268,7 +271,7 @@
             <div id="paydays-{{month}}" class="payday-list">
               {% if paydays_by_month[month] %} {% for p in
               paydays_by_month[month] %}
-              <div>👤 {{p.username}} — {{p.date}} — ${{p.amount}}</div>
+              <div>👤 {{p.username}} — {{p.date}} — G{{p.amount}}</div>
               {% endfor %} {% else %}
               <div>No paydays</div>
               {% endif %}
@@ -300,7 +303,7 @@
             {% else %}
             <td class="{% if day in paid_days %}paid-day{% endif %}">
               {{day}} {% if day in contribution_days %}
-              <br /><small>${{ contribution_days[day] }}</small>
+              <br /><small>G {{ contribution_days[day] }}</small>
               {% endif %}
             </td>
             {% endif %} {% endfor %}
@@ -314,12 +317,136 @@
     <script>
       function togglePaydays(month) {
         const el = document.getElementById("paydays-" + month);
-        if (el.style.display === "block") {
-          el.style.display = "none";
-        } else {
-          el.style.display = "block";
+        el.style.display = el.style.display === "block" ? "none" : "block";
+      }
+
+      let currentLang = "fr"; // default
+
+      const months = {
+        en: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
+        ],
+        fr: [
+          "Janvier",
+          "Février",
+          "Mars",
+          "Avril",
+          "Mai",
+          "Juin",
+          "Juillet",
+          "Août",
+          "Septembre",
+          "Octobre",
+          "Novembre",
+          "Décembre",
+        ],
+      };
+
+      const days = {
+        en: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        fr: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+      };
+
+      const translations = {
+        en: {
+          welcome: "Welcome",
+          payday: "Payday",
+          admin: "Admin",
+          logout: "Logout",
+          viewCalendar: "📅 View Full Calendar",
+          rosca1: "Rosca 1 (HTG 10.000.00) Users",
+          rosca2: "Rosca 2 (HTG 3.000.00) Users",
+          nextPayday: "Next Payday",
+          noPaydays: "No paydays",
+        },
+        fr: {
+          welcome: "Bienvenue",
+          payday: "Jour de paie",
+          admin: "Admin",
+          logout: "Déconnexion",
+          viewCalendar: "📅 Voir le calendrier complet",
+          rosca1: "Utilisateurs Rosca 1 (HTG 10.000.00)",
+          rosca2: "Utilisateurs Rosca 2 (HTG 3.000.00)",
+          nextPayday: "Prochain jour de paie",
+          noPaydays: "Aucun paiement",
+        },
+      };
+
+      function applyTranslations(lang) {
+        const t = translations[lang];
+
+        // Header
+        document.querySelector("h4").innerText = t.welcome + ", {{username}}";
+        document.querySelector('a[href="/payday"]').innerText = t.payday;
+        const adminBtn = document.querySelector('a[href="/admin"]');
+        if (adminBtn) adminBtn.innerText = t.admin;
+        document.querySelector('a[href="/logout"]').innerText = t.logout;
+
+        // Main button
+        document.querySelector(".main-btn").innerText = t.viewCalendar;
+
+        // Admin cards
+        const cards = document.querySelectorAll(".admin-card h5");
+        if (cards.length >= 3) {
+          cards[0].innerText = t.rosca1;
+          cards[1].innerText = t.rosca2;
+          cards[2].innerText = t.nextPayday;
+        }
+
+        // Admin month cards
+        document.querySelectorAll(".month-card").forEach((card, index) => {
+          const monthNum = index + 1; // month index 1-12
+          const titleEl = card.querySelector(".month-title");
+          if (titleEl) {
+            titleEl.innerText = months[lang][monthNum - 1] + " {{now.year}}";
+          }
+
+          // Translate "No paydays" inside payday-list only if empty
+          const paydayList = card.querySelector(".payday-list");
+          if (paydayList) {
+            // Only replace if it currently contains "No paydays" or "Aucun paiement"
+            if (
+              paydayList.innerText.trim() === "No paydays" ||
+              paydayList.innerText.trim() === "Aucun paiement"
+            ) {
+              paydayList.innerText = t.noPaydays;
+            }
+          }
+        });
+
+        // Calendar weekday headers
+        document.querySelectorAll("table.calendar th").forEach((th, i) => {
+          th.innerText = days[lang][i];
+        });
+
+        // User calendar title (outside admin)
+        const titleEl = document.querySelector("h5.mt-5");
+        if (titleEl) {
+          const currentMonthIndex = new Date().getMonth();
+          const year = new Date().getFullYear();
+          titleEl.innerText = months[lang][currentMonthIndex] + " " + year;
         }
       }
+
+      function toggleLanguage() {
+        currentLang = currentLang === "en" ? "fr" : "en";
+        applyTranslations(currentLang);
+      }
+
+      window.onload = function () {
+        applyTranslations("fr"); // default to French
+      };
     </script>
   </body>
 </html>

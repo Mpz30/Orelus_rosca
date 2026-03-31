@@ -250,6 +250,33 @@
           margin-left: auto;
         }
       }
+
+      /* ================= MOBILE FIXES ================= */
+      @media (max-width: 768px) {
+        /* Stack Admin Panel title on top of buttons */
+        .d-flex.justify-content-between.align-items-center.mb-4 {
+          flex-direction: column; /* stack vertically */
+          align-items: center; /* center horizontally */
+          gap: 15px; /* space between title and buttons */
+          padding: 1rem;
+        }
+
+        /* Center buttons below Admin Panel */
+        .d-flex.justify-content-between.align-items-center.mb-4 .d-flex.gap-2 {
+          flex-direction: row; /* keep buttons side by side */
+          justify-content: center;
+          gap: 10px; /* spacing between buttons */
+          width: 100%;
+        }
+
+        /* Optional: make buttons slightly smaller on mobile */
+        .d-flex.justify-content-between.align-items-center.mb-4
+          .d-flex.gap-2
+          .btn {
+          flex: 1 1 auto; /* allow buttons to grow evenly */
+          max-width: 150px;
+        }
+      }
     </style>
   </head>
 
@@ -258,11 +285,11 @@
       <div
         class="d-flex justify-content-between align-items-center mb-4 fixed-top-bar"
       >
-        <h3>Admin Panel</h3>
+        <h3>Panneau D'admin</h3>
 
         <div class="d-flex gap-2">
-          <a href="/dashboard" class="btn btn-secondary">Dashboard</a>
-          <a href="/logout" class="btn btn-danger">Logout</a>
+          <a href="/dashboard" class="btn btn-secondary">Tableau de bord</a>
+          <a href="/logout" class="btn btn-danger">Déconnexion</a>
         </div>
       </div>
 
@@ -284,12 +311,12 @@
 
       <!-- Create Rosca(s) Card -->
       <div class="create-user-card">
-        <div class="card-header">Create Rosca(s)</div>
+        <div class="card-header">Créer Rosca(s)</div>
         <form action="{{ url_for('create_rosca_template') }}" method="POST">
           <div class="row mb-2 align-items-center">
             <div class="col-md-2 d-flex align-items-center">
               <label class="form-label selectRosca mb-0 me-2"
-                >Select Rosca:</label
+                >Sélectionnez Rosca:</label
               >
               <select name="rosca_number" class="form-select form-select-sm">
                 <option value="1">Rosca 1</option>
@@ -298,7 +325,7 @@
             </div>
 
             <div class="col-md-3">
-              <label class="form-label mb-0">From:</label>
+              <label class="form-label mb-0">De:</label>
               <input
                 type="date"
                 name="start_date"
@@ -308,7 +335,7 @@
             </div>
 
             <div class="col-md-3">
-              <label class="form-label mb-0">To:</label>
+              <label class="form-label mb-0">A:</label>
               <input
                 type="date"
                 name="end_date"
@@ -319,7 +346,7 @@
 
             <div class="col-md-2 d-flex align-items-end">
               <button type="submit" class="btn btn-success btn-sm w-100">
-                Create Rosca
+                Créer Rosca
               </button>
             </div>
           </div>
@@ -332,7 +359,7 @@
           class="mb-3"
         >
           <div class="d-flex align-items-center gap-2">
-            <label for="rosca" class="mb-0">Add to Rosca:</label>
+            <label for="rosca" class="mb-0">Ajouter à Rosca:</label>
             <select
               name="rosca"
               id="rosca"
@@ -348,11 +375,13 @@
               class="form-select form-select-sm"
               style="width: 120px"
             >
-              <option value="month">Add Month</option>
-              <option value="year">Add Year</option>
+              <option value="month">Ajouter un mois</option>
+              <option value="year">Ajouter une année</option>
             </select>
 
-            <button type="submit" class="btn btn-success btn-sm">Add</button>
+            <button type="submit" class="btn btn-success btn-sm">
+              Ajouter
+            </button>
           </div>
         </form>
 
@@ -363,7 +392,7 @@
           class="mb-3"
         >
           <div class="d-flex align-items-center gap-2">
-            <label class="mb-0">Remove from Rosca:</label>
+            <label class="mb-0">Supprimer de Rosca:</label>
             <select
               name="rosca"
               class="form-select form-select-sm"
@@ -378,11 +407,13 @@
               class="form-select form-select-sm"
               style="width: 120px"
             >
-              <option value="month">Remove Month</option>
-              <option value="year">Remove Year</option>
+              <option value="month">Supprimer un mois</option>
+              <option value="year">Supprimer une année</option>
             </select>
 
-            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            <button type="submit" class="btn btn-danger btn-sm">
+              Supprimer
+            </button>
           </div>
         </form>
       </div>
@@ -396,10 +427,11 @@
           selectattr("rosca_number","equalto", rosca_number) | list %} {% if
           templates %} {% set latest = templates[0] %}
           <span class="ms-2 text-muted"
-            >From {{ latest.start_date }} To {{ latest.end_date }}</span
+            >De <strong>{{ latest.start_date }}</strong> A
+            <strong>{{ latest.end_date }}</strong></span
           >
           {% else %}
-          <span class="ms-2 text-muted">No Rosca created yet</span>
+          <span class="ms-2 text-muted">Aucun Rosca créé pour le moment</span>
           {% endif %}
         </div>
         {% endfor %}
@@ -407,7 +439,7 @@
 
       <!-- Create User Card -->
       <div class="create-user-card">
-        <div class="card-header">Create New User</div>
+        <div class="card-header">Créer nouvel utilisateur</div>
         <form action="/admin/create_user" method="POST">
           <div class="row mb-2">
             <div class="col-md-4">
@@ -415,7 +447,7 @@
                 type="text"
                 name="username"
                 class="form-control"
-                placeholder="Username"
+                placeholder="Nom d'utilisateur"
                 required
               />
             </div>
@@ -424,7 +456,7 @@
                 type="password"
                 name="password"
                 class="form-control"
-                placeholder="Password"
+                placeholder="Mot de passe"
                 required
               />
             </div>
@@ -447,7 +479,7 @@
                 step="0.01"
                 name="contribution_amount_rosca1"
                 class="form-control"
-                placeholder="Amount Rosca 1"
+                placeholder="Montant Rosca 1"
               />
             </div>
 
@@ -467,13 +499,13 @@
                 step="0.01"
                 name="contribution_amount_rosca2"
                 class="form-control"
-                placeholder="Amount Rosca 2"
+                placeholder="Montant Rosca 2"
               />
             </div>
 
             <div class="col-md-2">
               <button type="submit" class="btn btn-primary w-100">
-                Create User
+                Créer un utilisateur
               </button>
             </div>
           </div>
@@ -499,9 +531,9 @@
 
         <div class="col-md-3">
           {% if rosca_number == 1 %}
-          <div>${{ '%.2f' % user.contribution_amount_rosca1 }}</div>
+          <div>HTG {{ '%.2f' % user.contribution_amount_rosca1 }}</div>
           {% elif rosca_number == 2 %}
-          <div>${{ '%.2f' % user.contribution_amount_rosca2 }}</div>
+          <div>HTG {{ '%.2f' % user.contribution_amount_rosca2 }}</div>
           {% endif %}
         </div>
 
@@ -514,12 +546,12 @@
             <input
               type="password"
               name="new_password"
-              placeholder="New Password"
+              placeholder="Nouveau mot de passe"
               class="form-control"
               required
             />
             <button type="submit" class="btn btn-warning">
-              Reset Password
+              Réinitialiser le mot de passe
             </button>
           </form>
         </div>
@@ -530,7 +562,7 @@
             method="POST"
             class="delete-form"
           >
-            <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="submit" class="btn btn-danger">Supprimer</button>
           </form>
         </div>
       </div>
