@@ -68,6 +68,79 @@
           gap: 10px;
         }
       }
+
+      @media (max-width: 480px) {
+        table {
+          font-size: 12px !important; /* Smaller text */
+          table-layout: fixed !important; /* Keep table width inside card */
+          width: 100% !important;
+        }
+
+        table th,
+        table td {
+          padding: 6px 4px !important; /* Reduce padding */
+          white-space: normal !important; /* Allow wrapping */
+          word-break: break-word !important; /* Break long words */
+          text-align: center !important; /* Keep cells centered */
+        }
+
+        .badge-upcoming,
+        .badge-past {
+          font-size: 10px !important;
+          padding: 2px 4px !important;
+        }
+
+        .card form .form-control,
+        .card form .form-select,
+        .card form .btn {
+          font-size: 12px !important;
+          padding: 4px 6px !important;
+        }
+      }
+
+      /* Landscape: show Actions column and fit table neatly */
+      @media (max-width: 768px) and (orientation: landscape) {
+        .table-wrapper {
+          display: flex;
+          justify-content: center; /* center the table inside the card */
+        }
+
+        .table-wrapper table {
+          width: 100%; /* table takes full card width */
+          table-layout: auto; /* columns adjust naturally */
+        }
+
+        /* Show Actions column */
+        .table-wrapper table th:last-child,
+        .table-wrapper table td:last-child {
+          display: table-cell !important;
+        }
+
+        /* Adjust padding for neat spacing */
+        .table-wrapper table th,
+        .table-wrapper table td {
+          padding: 6px 4px;
+          white-space: nowrap; /* prevent wrapping inside cells */
+          text-align: center;
+        }
+
+        .badge-upcoming,
+        .badge-past {
+          font-size: 10px;
+          padding: 2px 4px;
+        }
+
+        /* Slightly smaller action buttons */
+        .table-wrapper .btn-sm {
+          font-size: 11px;
+          padding: 3px 6px;
+        }
+
+        /* Optional: tighten spacing between buttons */
+        .table-wrapper .d-flex.gap-2 {
+          gap: 4px !important;
+        }
+      }
     </style>
   </head>
   <body>
@@ -129,7 +202,7 @@
       {% endif %}
 
       <!-- Payday Table -->
-      <div class="card shadow">
+      <div class="card shadow table-wrapper">
         <table class="table table-bordered table-hover">
           <thead class="table-light">
             <tr>
